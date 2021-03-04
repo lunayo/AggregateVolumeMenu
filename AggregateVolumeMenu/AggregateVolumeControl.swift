@@ -94,33 +94,22 @@ class AggregateVolumeControl {
         for i in 0..<subDeviceCount {
             let subDevice:AudioDeviceID = subDevicesID[i]
             
-            var volLeft:Float = 0.0
-            var volRight:Float = 0.0
+            var volMaster:Float = 0.0
                         
             address = AudioObjectPropertyAddress(
                 mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
                 mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:1)
+                mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
             propsize = UInt32(MemoryLayout<Float>.size)
             
-            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &volLeft)
+            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &volMaster)
+            print(result)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft")
+                print("kAudioDevicePropertyVolumeScalar volMaster \(result)")
                 exit(-1)
             }
             
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:2)
-            propsize = UInt32(MemoryLayout<Float>.size)
-            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &volRight)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight")
-                exit(-1)
-            }
-            
-            volAvg += (volLeft + volRight) / 2
+            volAvg += volMaster
         }
 
         volAvg = volAvg / Float(subDeviceCount)
@@ -144,23 +133,12 @@ class AggregateVolumeControl {
             address = AudioObjectPropertyAddress(
                 mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
                 mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:1)
+                mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
             propsize = UInt32(MemoryLayout<Float>.size)
             
             result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft")
-                exit(-1)
-            }
-            
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyVolumeScalar),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:2)
-            propsize = UInt32(MemoryLayout<Float>.size)
-            result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &vol)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight")
+                print("kAudioDevicePropertyVolumeScalar volMaster")
                 exit(-1)
             }
         }
@@ -175,26 +153,12 @@ class AggregateVolumeControl {
             address = AudioObjectPropertyAddress(
                 mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
                 mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:1)
+                mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
             propsize = UInt32(MemoryLayout<UInt32>.size)
             
             result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
             if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volLeft")
-                exit(-1)
-            }
-            if (mute == 1) {
-                return true
-            }
-            
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:2)
-            propsize = UInt32(MemoryLayout<UInt32>.size)
-            result = AudioObjectGetPropertyData(subDevice, &address, 0, nil, &propsize, &mute)
-            if (result != 0) {
-                print("kAudioDevicePropertyVolumeScalar volRight")
+                print("kAudioDevicePropertyVolumeScalar volMaster")
                 exit(-1)
             }
             if (mute == 1) {
@@ -214,23 +178,12 @@ class AggregateVolumeControl {
             address = AudioObjectPropertyAddress(
                 mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
                 mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:1)
+                mElement:AudioObjectPropertyElement(kAudioObjectPropertyElementMaster))
             propsize = UInt32(MemoryLayout<UInt32>.size)
             
             result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
             if (result != 0) {
-                print("kAudioDevicePropertyMute volLeft")
-                exit(-1)
-            }
-            
-            address = AudioObjectPropertyAddress(
-                mSelector:AudioObjectPropertySelector(kAudioDevicePropertyMute),
-                mScope:AudioObjectPropertyScope(kAudioDevicePropertyScopeOutput),
-                mElement:2)
-            propsize = UInt32(MemoryLayout<UInt32>.size)
-            result = AudioObjectSetPropertyData(subDevice, &address, 0, nil, propsize, &mut)
-            if (result != 0) {
-                print("kAudioDevicePropertyMute volRight")
+                print("kAudioDevicePropertyMute volMaster")
                 exit(-1)
             }
         }
